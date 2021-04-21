@@ -6,6 +6,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import newsanalyzer.ctrl.Controller;
+import newsapi.NewsApiBuilder;
+import newsapi.enums.Country;
+import newsapi.enums.Endpoint;
+import newsapi.enums.Language;
+import newsapi.enums.SortBy;
 
 public class UserInterface 
 {
@@ -13,15 +18,31 @@ public class UserInterface
 	private Controller ctrl = new Controller();
 
 	public void getDataFromCtrl1(){
-		System.out.println("ABC");
+		System.out.println("Headlines Österreich - Allgemein:");
 
-		ctrl.process();
+		ctrl.process(
+				"",
+				Endpoint.TOP_HEADLINES,
+				null,
+				Language.de,
+				Country.at,
+				SortBy.POPULARITY
+		);
 	}
 
 	public void getDataFromCtrl2(){
 	}
 
 	public void getDataFromCtrl3(){
+
+		ctrl.process(
+				"",
+				Endpoint.TOP_HEADLINES,
+				null,
+				Language.de,
+				Country.de,
+				SortBy.POPULARITY
+		);
 
 	}
 	
@@ -31,11 +52,11 @@ public class UserInterface
 
 
 	public void start() {
-		Menu<Runnable> menu = new Menu<>("User Interfacx");
+		Menu<Runnable> menu = new Menu<>("User Interface");
 		menu.setTitel("Wählen Sie aus:");
-		menu.insert("a", "Choice ABC", this::getDataFromCtrl1);
-		menu.insert("b", "Choice DEF", this::getDataFromCtrl2);
-		menu.insert("c", "Choice 3", this::getDataFromCtrl3);
+		menu.insert("a", "Headlines Österreich - Allgemein", this::getDataFromCtrl1);
+		menu.insert("b", "Headlines Österreich - Health", this::getDataFromCtrl2);
+		menu.insert("c", "News Österreich - Allgemein", this::getDataFromCtrl3);
 		menu.insert("d", "Choice User Imput:",this::getDataForCustomInput);
 		menu.insert("q", "Quit", null);
 		Runnable choice;
