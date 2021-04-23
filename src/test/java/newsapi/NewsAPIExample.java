@@ -12,7 +12,7 @@ public class NewsAPIExample {
 
     public static final String APIKEY = "57921b7703a54d128d168651c2abbd33";
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws NewsApiException {
 
         NewsApi newsApi = new NewsApiBuilder()
                 .setApiKey(APIKEY)

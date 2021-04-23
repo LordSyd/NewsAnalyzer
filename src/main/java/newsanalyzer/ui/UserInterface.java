@@ -7,47 +7,101 @@ import java.io.InputStreamReader;
 
 import newsanalyzer.ctrl.Controller;
 import newsapi.NewsApiBuilder;
-import newsapi.enums.Country;
-import newsapi.enums.Endpoint;
-import newsapi.enums.Language;
-import newsapi.enums.SortBy;
+import newsapi.NewsApiException;
+import newsapi.enums.*;
+
+import java.util.Scanner;
+
+
 
 public class UserInterface 
 {
 
+	private String query ="";
+
 	private Controller ctrl = new Controller();
+
+	/*
+	Booleans could be used for switch analysis on and off
+	 */
+	private boolean shortest;
+	private boolean articleCount;
+	private boolean titlesSorted;
+	private boolean mostArticleProvider;
+
+
 
 	public void getDataFromCtrl1(){
 		System.out.println("Headlines Österreich - Allgemein:");
-
-		ctrl.process(
-				"",
-				Endpoint.TOP_HEADLINES,
-				null,
-				Language.de,
-				Country.at,
-				SortBy.POPULARITY
-		);
+		try {
+			ctrl.process(
+					query,
+					Endpoint.TOP_HEADLINES,
+					null,
+					Language.de,
+					Country.at,
+					SortBy.POPULARITY,
+					true,
+					true,
+					true,
+					true
+			);
+		}catch(NewsApiException e){
+			System.out.println("An Error has ocurred");
+			System.out.println(e.getMessage());
+		}
 	}
 
 	public void getDataFromCtrl2(){
+		try {
+			ctrl.process(
+					query,
+					Endpoint.TOP_HEADLINES,
+					null,
+					Language.de,
+					Country.de,
+					SortBy.POPULARITY,
+					true,
+					true,
+					true,
+					true
+			);
+		}catch(NewsApiException e){
+			System.out.println("An Error has ocurred");
+			System.out.println(e.getMessage());
+		}
 	}
 
 	public void getDataFromCtrl3(){
-
-		ctrl.process(
-				"",
-				Endpoint.TOP_HEADLINES,
-				null,
-				Language.de,
-				Country.de,
-				SortBy.POPULARITY
-		);
-
+		try {
+			ctrl.process(
+					query,
+					Endpoint.TOP_HEADLINES,
+					Category.health,
+					Language.de,
+					Country.at,
+					SortBy.POPULARITY,
+					true,
+					true,
+					true,
+					true
+			);
+		}catch(NewsApiException e){
+			System.out.println("An Error has occurred");
+			System.out.println(e.getMessage());
+		}
 	}
 	
 	public void getDataForCustomInput() {
-		
+		System.out.print("Please enter search term: ");
+		query = readLine();
+		Menu<Runnable> menu = new Menu<>("User Interface");
+		menu.setTitel("Wählen Sie aus:");
+		menu.insert("a", "Headlines Österreich - Allgemein - Mit Datenanalyse", this::getDataFromCtrl1);
+		menu.insert("b", "Headlines Österreich - Health", this::getDataFromCtrl2);
+		menu.insert("c", "News Österreich - Allgemein", this::getDataFromCtrl3);
+		menu.insert("d", "Set query:",this::getDataForCustomInput);
+		menu.insert("q", "Quit", null);
 	}
 
 
@@ -57,7 +111,7 @@ public class UserInterface
 		menu.insert("a", "Headlines Österreich - Allgemein", this::getDataFromCtrl1);
 		menu.insert("b", "Headlines Österreich - Health", this::getDataFromCtrl2);
 		menu.insert("c", "News Österreich - Allgemein", this::getDataFromCtrl3);
-		menu.insert("d", "Choice User Imput:",this::getDataForCustomInput);
+		menu.insert("d", "Set query:",this::getDataForCustomInput);
 		menu.insert("q", "Quit", null);
 		Runnable choice;
 		while ((choice = menu.exec()) != null) {
