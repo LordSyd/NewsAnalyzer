@@ -12,10 +12,10 @@ import java.util.Objects;
 
 public abstract class Downloader {
 
-    public static final String HTML_EXTENTION = ".html";
-    public static final String DIRECTORY_DOWNLOAD = "src/download/";
+    public static final String HTML_EXTENSION = ".html";
+    public static final String DIRECTORY_DOWNLOAD = "./src/download/";
 
-    public abstract int process(List<String> urls) throws NewsApiException;
+    public abstract int process(List<String> urls);
 
     public String saveUrl2File(String urlString) throws NewsApiException {
         InputStream is = null;
@@ -26,24 +26,27 @@ public abstract class Downloader {
             is = url4download.openStream();
 
             fileName = urlString.substring(urlString.lastIndexOf('/') + 1);
-            if (fileName.isEmpty()) {
-                fileName = url4download.getHost() + HTML_EXTENTION;
-            }
-            os = new FileOutputStream(DIRECTORY_DOWNLOAD + fileName);
 
+            if (fileName.isEmpty()) {
+                fileName = url4download.getHost() + HTML_EXTENSION;
+            }
+            fileName = fileName.replaceFirst("\\?", "");
+            fileName = fileName.replaceAll(",","");
+            fileName = fileName.replaceAll(";","");
+            os = new FileOutputStream(DIRECTORY_DOWNLOAD + fileName);
             byte[] b = new byte[2048];
             int length;
             while ((length = is.read(b)) != -1) {
                 os.write(b, 0, length);
             }
         } catch (IOException e) {
-            throw new NewsApiException("File not found!");
+            throw new NewsApiException("File not found!" + fileName);
         } finally {
             try {
                 Objects.requireNonNull(is).close();
                 Objects.requireNonNull(os).close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                System.out.println("Could not download some files");
             }
         }
         return fileName;

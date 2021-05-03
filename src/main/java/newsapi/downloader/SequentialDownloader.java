@@ -1,7 +1,5 @@
 package newsapi.downloader;
 
-import newsapi.NewsApiException;
-
 import java.util.List;
 
 public class SequentialDownloader extends Downloader {
