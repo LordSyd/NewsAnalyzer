@@ -5,19 +5,22 @@ import newsapi.NewsApiBuilder;
 import newsapi.NewsApiException;
 import newsapi.beans.Article;
 import newsapi.beans.NewsReponse;
+import newsapi.downloader.Downloader;
+import newsapi.downloader.ParallelDownloader;
+import newsapi.downloader.SequentialDownloader;
 import newsapi.enums.*;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-
+import java.util.stream.Stream;
 
 
 public class Controller {
 
 	public static final String APIKEY = "57921b7703a54d128d168651c2abbd33";
-	 private NewsReponse newsResponse;
+	private NewsReponse newsResponse = null;
+
 
 	public void process(String query,
 						Endpoint endpoint,
@@ -48,9 +51,10 @@ public class Controller {
 			throw new NewsApiException("An Error has occurred");
 		}
 
+		List<Article> articles;
 		if(newsResponse != null){
 
-			List<Article> articles = newsResponse.getArticles();
+			articles = newsResponse.getArticles();
 			articles.stream().forEach(article -> System.out.println(article.toString()));
 			System.out.print("\nDatenanalyse:\n");
 
@@ -70,11 +74,40 @@ public class Controller {
 				Collections.reverse(sortedTitles);
 				sortedTitles.forEach(e -> System.out.println(e.getTitle()));
 			}
+
+
 		}else{
 			throw new NewsApiException("Error: News response is null");
 		}
 
 		System.out.println("End process");
+	}
+
+	public String downloadLastSearch(Downloader downloader) throws NewsApiException{
+		if (newsResponse != null){
+			downloader.process(getURLList(newsResponse.getArticles()));
+			return "success";
+		}else{
+			return "error";
+		}
+	}
+
+	public List<String> getURLList(List<Article> data){
+
+		return Stream.concat(
+				data
+						.stream()
+						.map(Article::getUrl)
+						.filter(Objects::nonNull)
+						.collect(Collectors.toList())
+						.stream(),
+				data
+						.stream()
+						.map(Article::getUrlToImage)
+						.filter(Objects::nonNull)
+						.collect(Collectors.toList())
+						.stream()
+		).collect(Collectors.toList());
 	}
 
 	public String getShortestNameInData(List<Article> data) throws NewsApiException {

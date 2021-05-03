@@ -6,15 +6,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import newsanalyzer.ctrl.Controller;
-import newsapi.NewsApiBuilder;
+
 import newsapi.NewsApiException;
+import newsapi.downloader.*;
 import newsapi.enums.*;
 
-import java.util.Scanner;
 
-
-
-public class UserInterface 
+public class UserInterface
 {
 
 	private String query ="";
@@ -29,7 +27,17 @@ public class UserInterface
 	private boolean titlesSorted;
 	private boolean mostArticleProvider;
 
+	private Downloader downloader;
 
+	public void setParallelDownloader() {
+		downloader = new ParallelDownloader();
+		startDownload();
+	}
+
+	public void setSequentialDownloader(){
+		downloader = new SequentialDownloader();
+		startDownload();
+	}
 
 	public void getDataFromCtrl1(){
 		System.out.println("Headlines Österreich - Allgemein:");
@@ -91,18 +99,32 @@ public class UserInterface
 			System.out.println(e.getMessage());
 		}
 	}
+
+
+
+	public void startDownload() {
+		String result = "error";
+
+		try{
+			result = ctrl.downloadLastSearch(downloader);
+		}catch (NewsApiException e) {
+			System.out.println(e.getMessage());
+		}
+
+		if ( result.equals("success")){
+			System.out.println("Download successful!");
+		}else{
+			System.out.println("Download error");
+		}
+	}
 	
 	public void getDataForCustomInput() {
 		System.out.print("Please enter search term: ");
 		query = readLine();
-		Menu<Runnable> menu = new Menu<>("User Interface");
-		menu.setTitel("Wählen Sie aus:");
-		menu.insert("a", "Headlines Österreich - Allgemein - Mit Datenanalyse", this::getDataFromCtrl1);
-		menu.insert("b", "Headlines Österreich - Health", this::getDataFromCtrl2);
-		menu.insert("c", "News Österreich - Allgemein", this::getDataFromCtrl3);
-		menu.insert("d", "Set query:",this::getDataForCustomInput);
-		menu.insert("q", "Quit", null);
+
 	}
+
+
 
 
 	public void start() {
@@ -111,7 +133,9 @@ public class UserInterface
 		menu.insert("a", "Headlines Österreich - Allgemein", this::getDataFromCtrl1);
 		menu.insert("b", "Headlines Österreich - Health", this::getDataFromCtrl2);
 		menu.insert("c", "News Österreich - Allgemein", this::getDataFromCtrl3);
-		menu.insert("d", "Set query:",this::getDataForCustomInput);
+		menu.insert("d", "Download last search - parallel",this::setParallelDownloader);
+		menu.insert("e", "Download last search - sequentiell",this::setSequentialDownloader);
+		menu.insert("f", "Set query:",this::getDataForCustomInput);
 		menu.insert("q", "Quit", null);
 		Runnable choice;
 		while ((choice = menu.exec()) != null) {
@@ -121,7 +145,9 @@ public class UserInterface
 	}
 
 
-    protected String readLine() {
+
+
+	protected String readLine() {
 		String value = "\0";
 		BufferedReader inReader = new BufferedReader(new InputStreamReader(System.in));
 		try {
