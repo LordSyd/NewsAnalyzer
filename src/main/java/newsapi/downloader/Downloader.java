@@ -13,7 +13,7 @@ import java.util.Objects;
 public abstract class Downloader {
 
     public static final String HTML_EXTENSION = ".html";
-    public static final String DIRECTORY_DOWNLOAD = "./src/download/";
+    public static final String DIRECTORY_DOWNLOAD = "./download/";
 
     public abstract int process(List<String> urls);
 

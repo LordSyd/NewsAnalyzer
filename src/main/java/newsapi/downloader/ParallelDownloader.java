@@ -15,20 +15,29 @@ public class ParallelDownloader extends Downloader {
         String fileName = null;
         long begin = System.currentTimeMillis();
         List<Future<String>> futures = new ArrayList<>();
+        List<Callable<String>> callableList = new ArrayList<>();
         for (String url : urls) {
 
             Callable<String> callable = new DownloaderCallable(url, this);
-            futures.add(executor.submit(callable));
+            callableList.add(callable);
 
+            //futures.add(executor.submit(callable));
+        }
+        try {
+            futures = executor.invokeAll(callableList);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         for (Future<String> future : futures){
             try {
                 fileName = future.get();
+
+                if (fileName != null){
+                    count++;
+                }
             } catch (Exception ignore) {}
 
-            if (fileName != null){
-                count++;
-            }
+
         }
         long end = System.currentTimeMillis();
 
